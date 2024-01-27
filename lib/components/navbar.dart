@@ -7,8 +7,11 @@ import 'package:riverpod_app/components/navIcons.dart';
 
 class BottomNavBar extends StatelessWidget {
   const BottomNavBar({
-    super.key,
+    super.key, required this.currentIndex, required this.ontap,
   });
+  final int currentIndex;
+  final Function ontap;
+
 
   @override
   Widget build(BuildContext context) {

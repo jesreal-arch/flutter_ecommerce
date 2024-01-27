@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:lottie/lottie.dart';
-import 'package:readmore/readmore.dart';
+
 import 'package:riverpod_app/components/card.dart';
 import 'package:riverpod_app/components/const.dart';
 import 'package:riverpod_app/components/dedtals.dart';
@@ -14,7 +14,7 @@ import 'package:riverpod_app/models/const.dart';
 
 import 'package:riverpod_app/models/model_product.dart';
 import 'package:riverpod_app/providers/provider.dart';
-import 'package:staggered_grid_view_flutter/widgets/staggered_grid_view.dart';
+
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class Home extends ConsumerWidget {
@@ -23,9 +23,17 @@ class Home extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final productProvider = ref.watch(showProductsProvider);
-    
+    final currentIndex = ref.watch(currentIndexProviderNavBar);
+
     return Scaffold(
-        bottomNavigationBar: const BottomNavBar(),
+        bottomNavigationBar: BottomNavBar(
+          currentIndex: currentIndex,
+          ontap: (value) {
+            ref
+                .read(currentIndexProviderNavBar.notifier)
+                .update((state) => value);
+          },
+        ),
         extendBody: true,
         body: CustomScrollView(
           slivers: [
