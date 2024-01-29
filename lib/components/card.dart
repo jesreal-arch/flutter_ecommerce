@@ -16,8 +16,10 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final CategoryModel categoryProduct =
+        CategoryModel.fromJson(products[index].category);
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(4.0),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -43,17 +45,19 @@ class ProductCard extends StatelessWidget {
                   ),
                   Align(
                     alignment: Alignment.topRight,
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(5),
+                    child: GestureDetector(
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(5),
+                          ),
                         ),
-                      ),
-                      child: LottieBuilder.network(
-                        "https://lottie.host/8749ea24-dcfe-4337-9b61-7de7ac9a6003/RfeMLuTV14.json",
-                        height: 35,
-                        width: 35,
+                        child: LottieBuilder.network(
+                          "https://lottie.host/8749ea24-dcfe-4337-9b61-7de7ac9a6003/RfeMLuTV14.json",
+                          height: 35,
+                          width: 35,
+                        ),
                       ),
                     ),
                   ),
@@ -75,7 +79,7 @@ class ProductCard extends StatelessWidget {
               ),
               ReadMoreText(
                 products[index].description,
-                trimLines: 2,
+                trimLines: 3,
                 colorClickableText: Colors.black,
                 trimMode: TrimMode.Line,
                 trimCollapsedText: 'Read more',
@@ -90,17 +94,32 @@ class ProductCard extends StatelessWidget {
                 "Price",
                 textAlign: TextAlign.left,
                 style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.w200,
+                    fontWeight: FontWeight.normal,
                     color: Colors.black,
                     fontSize: 10),
               ),
-              Text(
-                "Php. ${products[index].price}0",
-                textAlign: TextAlign.left,
-                style: GoogleFonts.poppins(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 13),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "P${products[index].price}0",
+                    textAlign: TextAlign.left,
+                    style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        fontSize: 12),
+                  ),
+                  Flexible(
+                    child: Text(
+                      categoryProduct.name,
+                      textAlign: TextAlign.left,
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w900,
+                          color: Colors.black,
+                          fontSize: 11),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

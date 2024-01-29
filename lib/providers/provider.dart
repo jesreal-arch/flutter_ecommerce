@@ -31,3 +31,10 @@ Future<List<CategoryModel>> showCategories(ShowCategoriesRef ref) async {
 final currentIndexProviderNavBar = StateProvider((ref) {
   return 0;
 });
+final currentIndexProviderHeader = StateProvider((ref) {
+  return 0;
+});
+final currentPageView = StateProvider((ref) {
+  return 0;
+});
+

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:ionicons/ionicons.dart';
 
 class NavICons extends StatelessWidget {
   const NavICons({
     super.key,
     required this.icon,
     required this.name,
+    required this.isSelected,
   });
 
   final IconData icon;
   final String name;
+  final bool isSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -20,15 +21,18 @@ class NavICons extends StatelessWidget {
         Expanded(
           child: Icon(
             icon,
-            color: Colors.white,
+            color: isSelected ? Colors.red : Colors.white,
           ),
         ),
         Flexible(
           child: Text(
             name,
             style: GoogleFonts.poppins(
-              fontSize: 12,
-                color: const Color.fromARGB(255, 255, 255, 255).withOpacity(.5), fontWeight: FontWeight.w400),
+                fontSize: 12,
+                color: isSelected
+                    ? Colors.red
+                    : const Color.fromARGB(255, 255, 255, 255).withOpacity(.5),
+                fontWeight: FontWeight.w400),
           ),
         ),
       ],
