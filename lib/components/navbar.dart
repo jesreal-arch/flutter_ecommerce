@@ -61,6 +61,7 @@ class BottomNavBar extends ConsumerWidget {
                       isSelected: currentIndex == index,
                       icon: iconsnav[index],
                       name: titlenav[index],
+                      index: index,
                     ),
                   ),
                 );

@@ -18,3 +18,5 @@ class CartNotifier extends StateNotifier<CartModel> {
   }
 }
 final cartProvider = StateNotifierProvider((ref) => CartNotifier());
+
+

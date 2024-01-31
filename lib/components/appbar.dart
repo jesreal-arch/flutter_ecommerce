@@ -2,6 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ionicons/ionicons.dart';
 import 'package:lottie/lottie.dart';
 import 'package:riverpod_app/components/const.dart';
 import 'package:riverpod_app/components/search.dart';
@@ -18,8 +19,45 @@ class AppBarCarousel extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final addCart = ref.watch(cartProvider) as CartModel;
     return SliverAppBar.medium(
+      centerTitle: true,
+      automaticallyImplyLeading: false,
+      title: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            LottieBuilder.network(
+              "https://lottie.host/1f0ce3e8-3ea4-49fe-8125-9af227dae49f/FmSnVEFKKj.json",
+              height: 50,
+              width: 50,
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Column(
+              children: [
+                Text(
+                  "Just for you!",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  "Shop what you need!",
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
       backgroundColor: const Color.fromARGB(255, 43, 42, 42),
-      title: const Search(),
       expandedHeight: 200,
       flexibleSpace: FlexibleSpaceBar(
           background: Stack(
@@ -64,7 +102,7 @@ class AppBarCarousel extends ConsumerWidget {
                   )),
                   Flexible(
                     child: GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -72,7 +110,6 @@ class AppBarCarousel extends ConsumerWidget {
                           ),
                         );
                       },
-                      
                       child: Stack(
                         children: [
                           LottieBuilder.network(

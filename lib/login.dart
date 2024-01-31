@@ -1,19 +1,34 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:riverpod_app/components/const.dart';
-import 'package:riverpod_app/home.dart';
+import 'package:lottie/lottie.dart';
 
-class Login extends StatefulWidget {
+import 'package:riverpod_app/components/const.dart';
+import 'package:http/http.dart' as https;
+
+import 'package:riverpod_app/home.dart';
+import 'package:riverpod_app/models/token.dart';
+import 'package:riverpod_app/providers/provider.dart';
+
+class Login extends ConsumerStatefulWidget {
   const Login({super.key});
 
   @override
-  State<Login> createState() => _LoginState();
+  ConsumerState<Login> createState() => _LoginState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginState extends ConsumerState<Login> {
+  final email = TextEditingController();
+  final pass = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final authUser = ref.watch(userTokenProvider);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: bg,
@@ -100,6 +115,7 @@ class _LoginState extends State<Login> {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 20.0),
                               child: TextField(
+                                controller: email,
                                 style: GoogleFonts.openSans(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold),
@@ -151,7 +167,8 @@ class _LoginState extends State<Login> {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 20.0),
                               child: TextField(
-                                obscureText: true,
+                                controller: pass,
+                                obscureText: false,
                                 style: GoogleFonts.openSans(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold),
@@ -172,13 +189,27 @@ class _LoginState extends State<Login> {
                   height: 10,
                 ),
                 GestureDetector(
-                  onTap: (){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>  const Home(),
-                      ),
-                    );
+                  onTap: () {
+                    (login(email.text, pass.text));
+
+                    /*if (email.text.isNotEmpty && pass.text.isNotEmpty) {
+                      final authArgs = AuthArgs(
+                        email: email.text,
+                        password: pass.text,
+                      );
+                      ref.read(authLoginProvider(authArgs));
+                      final isAuthenticated =
+                          ref.read(getIsAuthenticatedProvider);
+                      if (isAuthenticated.value!) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Home(),
+                          ),
+                        );
+                      }
+                    }
+                    */
                   },
                   child: Container(
                     height: 60,
@@ -207,7 +238,10 @@ class _LoginState extends State<Login> {
                                 fontSize: 15,
                                 color: const Color.fromARGB(255, 4, 41, 71)),
                           ),
-                          const SizedBox(width: 10,),                        const FaIcon(FontAwesomeIcons.arrowRight,
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          const FaIcon(FontAwesomeIcons.arrowRight,
                               color: Color.fromARGB(255, 4, 41, 71)),
                         ],
                       ),
@@ -220,5 +254,48 @@ class _LoginState extends State<Login> {
         )
       ]),
     );
+  }
+
+  Future<void> login(String email, String pass) async {
+    if (email.isNotEmpty && pass.isNotEmpty) {
+      var res = await https.post(
+          Uri.parse("https://api.escuelajs.co/api/v1/auth/login"),
+          body: ({
+            'email': email,
+            'password': pass,
+          }));
+
+      if (res.statusCode == 201) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return LottieBuilder.network(
+                "https://lottie.host/dc49cc07-ea7c-4092-8d1a-2bdbbb99bd95/TrcvRX1arR.json");
+          },
+        );
+        Future.delayed(const Duration(seconds: 5), () {
+          Navigator.pop(context); //pop dialog
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const Home(),
+            ),
+          );
+        });
+        var data = jsonDecode(res.body.toString());
+        ref.read(userTokenProvider.notifier).update((token) {
+          return data['access_token'];
+        });
+        print(ref.watch(userTokenProvider));
+        print('Login successfully');
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("Mali")));
+      }
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Error")));
+    }
   }
 }

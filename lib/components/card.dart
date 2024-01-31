@@ -38,30 +38,8 @@ class ProductCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Stack(
-                children: [
-                  Image.network(
-                    products[index].images[0],
-                  ),
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: GestureDetector(
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(5),
-                          ),
-                        ),
-                        child: LottieBuilder.network(
-                          "https://lottie.host/8749ea24-dcfe-4337-9b61-7de7ac9a6003/RfeMLuTV14.json",
-                          height: 35,
-                          width: 35,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              Image.network(
+                products[index].images[0],
               ),
               const SizedBox(
                 height: 10,

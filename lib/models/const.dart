@@ -5,11 +5,10 @@ import 'package:riverpod_app/components/navIcons.dart';
 List<String> categories_prods = [
   "All",
   "Clothes",
-  "Furniture",
   "Electronics",
+  "Furniture",
   "Miscellaneous"
 ];
-
 
 List<IconData> iconsnav = [
   Ionicons.home_outline,
