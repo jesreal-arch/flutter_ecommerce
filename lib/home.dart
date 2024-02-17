@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:lottie/lottie.dart';
+import 'package:riverpod_app/auth/auth_riverpod.dart';
 import 'package:riverpod_app/components/appbar.dart';
 
 import 'package:riverpod_app/components/card.dart';
@@ -18,6 +19,7 @@ import 'package:riverpod_app/models/const.dart';
 
 import 'package:riverpod_app/models/model_product.dart';
 import 'package:riverpod_app/providers/addtocart.dart';
+import 'package:riverpod_app/providers/firebase/firebase_riverpod.dart';
 import 'package:riverpod_app/providers/provider.dart';
 
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -32,85 +34,121 @@ class Home extends ConsumerWidget {
     final productProvider =
         ref.watch(ShowProductsProvider("${header + 1}", searchprovider));
     final category = ref.watch(showcategoryProvider);
-
+    final userToken = ref.watch(userTokenProvider);
+    final currentUser = ref.watch(CurrentUserProvider(userToken));
+    final categorySegmented = ref.watch(showcategoryProvider);
     return Scaffold(
         bottomNavigationBar: const BottomNavBar(),
         extendBody: true,
         body: CustomScrollView(
           physics: const ScrollPhysics(),
           slivers: [
-            const AppBarCarousel(),
+            AppBarCarousel(
+                currentUser.when(data: (currentUser) {
+                  return currentUser.avatar;
+                }, error: (e, s) {
+                  return "https://cdn.pixabay.com/photo/2018/01/04/15/51/404-error-3060993_640.png";
+                }, loading: () {
+                  return "https://cdn-icons-png.flaticon.com/512/5509/5509456.png";
+                }),
+                currentUser.when(data: (currentUser) {
+                  return currentUser.name;
+                }, error: (e, s) {
+                  return "Who are  You? ";
+                }, loading: () {
+                  return "Please Wait";
+                })),
             const SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.symmetric(
-                          horizontal: 15.0, vertical: 10),
+                padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
                 child: Search(),
               ),
             ),
             SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: SizedBox(
-                  height: 50,
-                  child: category.when(
-                    data: (category) {
-                      final List<CategoryModel> categoryFinal =
-                          category.map((e) => e).toList();
-                      return ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: categoryFinal.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                  ref
-                                      .read(currentIndexProviderHeader.notifier)
-                                      .update((state) {
-                                    return index;
-                                  });
-                                  print(index);
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: header == index
-                                        ? Colors.black
-                                        : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                        width: 1, color: Colors.black),
-                                  ),
+              child: categorySegmented.when(
+                data: (categorySegmented) {
+                  final List<CategoryModel> categories =
+                      categorySegmented.map((e) => e).toList();
+                  return Padding(
+                     padding: const EdgeInsets.symmetric(
+                                      horizontal: 15.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Categories",
+                          style: GoogleFonts.poppins(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(
+                          height: 150,
+                          width: MediaQuery.of(context).size.width,
+                          child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: categories.length,
+                              itemBuilder: (_, i) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    ref
+                                        .read(currentIndexProviderHeader.notifier)
+                                        .update((state) {
+                                      return i;
+                                    });
+                                  },
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Center(
-                                        child: Text(
-                                      categoryFinal[index].name,
-                                      style: GoogleFonts.poppins(
-                                          color: header == index
-                                              ? Colors.white
-                                              : Colors.black,
-                                          fontWeight: FontWeight.w500),
-                                    )),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Flexible(
+                                          child: Container(
+                                            width: 150,
+                                            decoration: BoxDecoration(
+                                                boxShadow: const [
+                                                  BoxShadow(
+                                                    color: Colors.black12,
+                                                    offset: Offset(3, 0),
+                                                    blurRadius: 6,
+                                                  ),
+                                                ],
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                image: DecorationImage(
+                                                    fit: BoxFit.cover,
+                                                    image: NetworkImage(
+                                                        categories[i].image))),
+                                          ),
+                                        ),
+                                        Text(
+                                          categories[i].name,
+                                          style: GoogleFonts.poppins(
+                                              color: Colors.black,
+                                              fontWeight: header !=i ? FontWeight.w400: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              ),
-                            );
-                          });
-                    },
-                    error: ((error, stackTrace) {
-                      return Center(child: Text(error.toString()));
-                    }),
-                    loading: () {
-                      return Center(
-                        child: LottieBuilder.network(
-                            "https://lottie.host/cc8b7237-8dc1-475c-8ee1-2f0a61ecea96/xQEeIYCbGy.json"),
-                      );
-                    },
-                  ),
-                ),
+                                );
+                              }),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                error: ((error, stackTrace) {
+                  return Center(child: Text(error.toString()));
+                }),
+                loading: () {
+                  return Center(
+                    child: LottieBuilder.network(
+                        "https://lottie.host/cc8b7237-8dc1-475c-8ee1-2f0a61ecea96/xQEeIYCbGy.json"),
+                  );
+                },
               ),
             ),
-            
             SliverToBoxAdapter(
               child: productProvider.when(
                 data: (productProvider) {
@@ -120,8 +158,7 @@ class Home extends ConsumerWidget {
                     height: MediaQuery.of(context).size.height * 3,
                     width: MediaQuery.of(context).size.width,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 15.0, vertical: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -129,7 +166,7 @@ class Home extends ConsumerWidget {
                             "New collections!",
                             style: GoogleFonts.poppins(
                                 color: Colors.black,
-                                fontSize: 25,
+                                fontSize: 15,
                                 fontWeight: FontWeight.bold),
                           ),
                           Expanded(
@@ -195,6 +232,13 @@ class Home extends ConsumerWidget {
                                                                               Colors.white)),
                                                                   onPressed:
                                                                       () {
+                                                                    ref.read(AddtoCartProvider(
+                                                                        products[
+                                                                            index],
+                                                                        currentUser
+                                                                            .value!
+                                                                            .name));
+
                                                                     ref
                                                                         .read(cartProvider
                                                                             .notifier)

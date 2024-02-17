@@ -6,7 +6,8 @@ part 'model_product.g.dart';
 
 @Freezed(copyWith: true)
 class ProductModel with _$ProductModel {
-  const factory ProductModel({
+  const factory ProductModel(
+    double? quantity, {
     required int id,
     required String title,
     required double price,
@@ -18,8 +19,6 @@ class ProductModel with _$ProductModel {
   factory ProductModel.fromJson(Map<String, dynamic> json) =>
       _$ProductModelFromJson(json);
 }
-
-
 
 @Freezed()
 class CategoryModel with _$CategoryModel {

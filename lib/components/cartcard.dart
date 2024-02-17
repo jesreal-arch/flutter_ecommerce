@@ -1,33 +1,48 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:lottie/lottie.dart';
+import 'package:riverpod_app/auth/auth_riverpod.dart';
+import 'package:riverpod_app/models/cartmodel_snapshot.dart';
 import 'package:riverpod_app/models/model_product.dart';
 import 'package:riverpod_app/providers/addtocart.dart';
+import 'package:riverpod_app/providers/firebase/firebase_riverpod.dart';
 import 'package:riverpod_app/providers/provider.dart';
 
-class CartCard extends ConsumerWidget {
-  const CartCard({super.key, required this.index, required this.productModel});
+class CartCard extends HookConsumerWidget {
+  const CartCard({
+    super.key,
+    required this.docId,
+    required this.productModel,
+    required this.onDelete,
+  });
 
-  final int index;
-  final List<ProductModel> productModel;
+  final ProductModelFetch productModel;
+  final Function onDelete;
+  final String docId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final CategoryModel categoryProduct =
-        CategoryModel.fromJson(productModel[index].category);
+        CategoryModel.fromJson(productModel.category);
+    final add = useState(1);
+    final userToken = ref.watch(userTokenProvider);
+    final currentUser = ref.watch(CurrentUserProvider(userToken));
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Slidable(
         startActionPane: ActionPane(motion: const StretchMotion(), children: [
           SlidableAction(
-          spacing: 2,
-            onPressed: ((context) {
-              ref.read(cartProvider.notifier).removeTocart(productModel[index]);
-            }),
+            spacing: 2,
+            onPressed: (context) {
+              onDelete();
+            },
             backgroundColor: Colors.red,
             icon: Ionicons.trash_bin,
           ),
@@ -48,9 +63,7 @@ class CartCard extends ConsumerWidget {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                Flexible(
-                    flex: 1,
-                    child: Image.network(productModel[index].images[0])),
+                Flexible(flex: 1, child: Image.network(productModel.images[0])),
                 const SizedBox(
                   width: 5,
                 ),
@@ -61,7 +74,7 @@ class CartCard extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          productModel[index].title,
+                          productModel.title,
                           style: GoogleFonts.poppins(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -78,7 +91,7 @@ class CartCard extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "P${productModel[index].price}0",
+                              'P${productModel.quantity}',
                               style: GoogleFonts.poppins(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
@@ -87,15 +100,31 @@ class CartCard extends ConsumerWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                GestureDetector(
-                                    child: const Icon(
-                                        Ionicons.add_circle_outline)),
+                                IconButton(
+                                  icon: (const Icon(Ionicons.add)),
+                                  onPressed: () {
+                                    add.value++;
+                                    ref.read(UpdateQuanityProvider(
+                                        currentUser.value!.name,
+                                        docId,
+                                        productModel.price * add.value));
+                                  },
+                                ),
                                 Text(
-                                  "0",
+                                  add.value.toString(),
                                   style: GoogleFonts.poppins(
                                       fontWeight: FontWeight.bold),
                                 ),
-                                const Icon(Ionicons.remove_circle_outline),
+                                IconButton(
+                                  icon: (const Icon(Ionicons.remove)),
+                                  onPressed: () {
+                                    add.value--;
+                                    ref.read(UpdateQuanityProvider(
+                                        currentUser.value!.name,
+                                        docId,
+                                        productModel.price * add.value));
+                                  },
+                                ),
                               ],
                             )
                           ],

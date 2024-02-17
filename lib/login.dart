@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'dart:convert';
 
@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
+import 'package:riverpod_app/auth/auth_riverpod.dart';
 
 import 'package:riverpod_app/components/const.dart';
 import 'package:http/http.dart' as https;
@@ -14,6 +15,13 @@ import 'package:http/http.dart' as https;
 import 'package:riverpod_app/home.dart';
 import 'package:riverpod_app/models/token.dart';
 import 'package:riverpod_app/providers/provider.dart';
+import 'package:riverpod_app/providers/supabase/supabase_services.dart';
+import 'package:riverpod_app/providers/supabase/user.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+final boolProvider = StateProvider<bool>((ref) {
+  return false;
+});
 
 class Login extends ConsumerStatefulWidget {
   const Login({super.key});
@@ -27,7 +35,7 @@ class _LoginState extends ConsumerState<Login> {
   final pass = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    final authUser = ref.watch(userTokenProvider);
+    final isLogin = ref.watch(boolProvider);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -190,7 +198,14 @@ class _LoginState extends ConsumerState<Login> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    (login(email.text, pass.text));
+                    ref.read(boolProvider.notifier).update(
+                          (state) => true,
+                        );
+                    (login(email.text, pass.text)).whenComplete(() {
+                      final currentToken = ref.watch(userTokenProvider);
+                      ref.read(CurrentUserProvider(currentToken));
+                      print(currentToken);
+                    });
 
                     /*if (email.text.isNotEmpty && pass.text.isNotEmpty) {
                       final authArgs = AuthArgs(
@@ -232,7 +247,7 @@ class _LoginState extends ConsumerState<Login> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Login",
+                            isLogin ? "Please Wait" : "Login",
                             style: GoogleFonts.openSans(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
@@ -241,8 +256,10 @@ class _LoginState extends ConsumerState<Login> {
                           const SizedBox(
                             width: 10,
                           ),
-                          const FaIcon(FontAwesomeIcons.arrowRight,
-                              color: Color.fromARGB(255, 4, 41, 71)),
+                          isLogin
+                              ? const CircularProgressIndicator()
+                              : const FaIcon(FontAwesomeIcons.arrowRight,
+                                  color: Color.fromARGB(255, 4, 41, 71)),
                         ],
                       ),
                     ),
@@ -264,7 +281,6 @@ class _LoginState extends ConsumerState<Login> {
             'email': email,
             'password': pass,
           }));
-
       if (res.statusCode == 201) {
         showDialog(
           context: context,
@@ -284,16 +300,21 @@ class _LoginState extends ConsumerState<Login> {
           );
         });
         var data = jsonDecode(res.body.toString());
+
         ref.read(userTokenProvider.notifier).update((token) {
           return data['access_token'];
         });
-        print(ref.watch(userTokenProvider));
+
         print('Login successfully');
+
+        /*ref.read(userAddProvider(ref.watch(userTokenProvider)));*/
       } else {
+        ref.read(boolProvider.notifier).update((state) => false);
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text("Mali")));
       }
     } else {
+      ref.read(boolProvider.notifier).update((state) => false);
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("Error")));
     }

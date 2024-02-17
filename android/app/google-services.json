@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "840595527235",
+    "project_id": "jesreal-api-store-app",
+    "storage_bucket": "jesreal-api-store-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:840595527235:android:b7e1bfcba348dda83aa6f6",
+        "android_client_info": {
+          "package_name": "com.example.riverpod_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOi75B6kGt7N5h1BcLkHVFJjqUX_GT3eM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

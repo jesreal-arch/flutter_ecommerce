@@ -90,4 +90,5 @@ final currentPageView = StateProvider((ref) {
 });
 final searchProvider = StateProvider((ref) => "");
 
-final userTokenProvider = StateProvider<String>((ref) => "");
+final userTokenProvider = StateProvider((ref) => "");
+final timeprovider = StateProvider((ref) => false);

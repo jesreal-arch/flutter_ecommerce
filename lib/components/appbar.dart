@@ -11,9 +11,13 @@ import 'package:riverpod_app/pages/cartpage.dart';
 import 'package:riverpod_app/providers/addtocart.dart';
 
 class AppBarCarousel extends ConsumerWidget {
-  const AppBarCarousel({
+  const AppBarCarousel(
+    this.dp,
+    this.name, {
     super.key,
   });
+  final String dp;
+  final String name;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -110,24 +114,22 @@ class AppBarCarousel extends ConsumerWidget {
                           ),
                         );
                       },
-                      child: Stack(
-                        children: [
-                          LottieBuilder.network(
-                              "https://lottie.host/1f0ce3e8-3ea4-49fe-8125-9af227dae49f/FmSnVEFKKj.json"),
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                "${addCart.cart.length} ",
-                                style: GoogleFonts.poppins(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20),
-                              ),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircleAvatar(
+                              radius: 60,
+                              backgroundImage: NetworkImage(dp),
                             ),
-                          )
-                        ],
+                            Text(
+                              "Hello $name!",
+                              style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

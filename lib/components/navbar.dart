@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:riverpod_app/chat/page.dart';
 import 'package:riverpod_app/components/const.dart';
 import 'package:riverpod_app/components/navIcons.dart';
 import 'package:riverpod_app/models/const.dart';
+import 'package:riverpod_app/pages/profilepage.dart';
 import 'package:riverpod_app/providers/provider.dart';
 
 class BottomNavBar extends ConsumerWidget {
@@ -14,7 +16,7 @@ class BottomNavBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-      final currentIndex = ref.watch(currentIndexProviderNavBar);
+    final currentIndex = ref.watch(currentIndexProviderNavBar);
 
     return ClipRRect(
       borderRadius: const BorderRadius.only(
@@ -56,6 +58,21 @@ class BottomNavBar extends ConsumerWidget {
                           .update((state) {
                         return index;
                       });
+                      if (index == 1) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ChatPage(),
+                          ),
+                        );
+                      } else if (index == 3) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProfilePage(),
+                          ),
+                        );
+                      }
                     },
                     child: NavICons(
                       isSelected: currentIndex == index,
